@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require "hq/grapher-icinga-perfdata/script"
+
+script = HQ::GrapherIcingaPerfdata::Script.new
+script.args = ARGV
+script.main
+exit script.status
