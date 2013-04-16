@@ -15,7 +15,7 @@ When /^I run hq-grapher-icinga-perfdata "(.*?)"$/ do
 	@script.args = Shellwords.split args_string
 
 	@rrd_updates = []
-	RRD.stub(:update) do
+	RRD::Wrapper.stub(:update) do
 		|*args|
 		@rrd_updates << args.join(" ")
 	end

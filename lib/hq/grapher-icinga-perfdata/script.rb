@@ -98,7 +98,7 @@ class Script
 
 				next unless mapping
 
-				RRD.update \
+				RRD::Wrapper.update \
 					"--daemon",
 					"%s:%s" % [
 						@daemon_elem["host"],
