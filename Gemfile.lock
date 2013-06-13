@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hq-grapher-icinga-perfdata (0.1.0)
+    hq-grapher-icinga-perfdata (0.1.1)
       hq-tools (>= 0.8.1)
       libxml-ruby (>= 2.6.0)
       rrd-ffi (>= 0.2.14)
