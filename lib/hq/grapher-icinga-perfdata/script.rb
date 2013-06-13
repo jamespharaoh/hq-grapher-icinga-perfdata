@@ -93,7 +93,7 @@ class Script < Tools::BaseScript
 						line.strip,
 					]
 
-					@status = 1
+					@status = 10
 
 					next
 

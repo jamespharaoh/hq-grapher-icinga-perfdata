@@ -61,6 +61,6 @@ Feature: Submit data from provided input
       Ignoring invalid data on line 2: 20,host1,service1,data1 = 20
       """
 
-    And the command exit status should be non-zero
+    And the command exit status should be 10
 
 # vim: et ts=2
