@@ -1,3 +1,4 @@
+@temp-dir
 Feature: Submit data from provided input
 
   Background:
@@ -32,6 +33,12 @@ Feature: Submit data from provided input
       </hq-grapher-icinga-perfdata-config>
       """
 
+    And a file "default.args":
+      """
+      --config default.config
+      input.data
+      """
+
   Scenario: Basic example
 
     Given a file "input.data":
@@ -39,12 +46,14 @@ Feature: Submit data from provided input
       10,host1,service1,data1=20
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph1.rrd 10:20
       """
+
+    And the command exit status should be 0
 
   Scenario: No lines
 
@@ -52,11 +61,13 @@ Feature: Submit data from provided input
       """
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       """
+
+    And the command exit status should be 0
 
   Scenario: Multiple lines
 
@@ -66,13 +77,15 @@ Feature: Submit data from provided input
       30,host2,service2,data2=40
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph1.rrd 10:20
       --daemon dhost:dport graph2.rrd 30:40
       """
+
+    And the command exit status should be 0
 
   Scenario: Multiple data points
 
@@ -81,12 +94,14 @@ Feature: Submit data from provided input
       10,host3,service3,data3=20 data4=30
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph3.rrd 10:20:30
       """
+
+    And the command exit status should be 0
 
   Scenario: Extra information
 
@@ -95,12 +110,14 @@ Feature: Submit data from provided input
       10,host1,service1,data1=20units;30;40;50;60
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph1.rrd 10:20
       """
+
+    And the command exit status should be 0
 
   Scenario: Space in data name
 
@@ -109,12 +126,14 @@ Feature: Submit data from provided input
       10,host4,service4,'data 5'=20
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph4.rrd 10:20
       """
+
+    And the command exit status should be 0
 
   Scenario: Apostrophe in data name
 
@@ -123,12 +142,14 @@ Feature: Submit data from provided input
       10,host5,service5,'data''6'=20
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph5.rrd 10:20
       """
+
+    And the command exit status should be 0
 
   Scenario: Missing value
 
@@ -137,12 +158,14 @@ Feature: Submit data from provided input
       10,host3,service3,data4=30
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph3.rrd 10:U:30
       """
+
+    And the command exit status should be 0
 
   Scenario: No values
 
@@ -151,9 +174,11 @@ Feature: Submit data from provided input
       10,host1,service1,
       """
 
-    When I run hq-grapher-icinga-perfdata "--config default.config input.data"
+    When I invoke hq-grapher-icinga-perfdata with "default.args"
 
     Then it should submit the following data:
       """
       --daemon dhost:dport graph1.rrd 10:U
       """
+
+    And the command exit status should be 0

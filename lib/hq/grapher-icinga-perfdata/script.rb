@@ -1,20 +1,17 @@
 require "rrd"
 require "xml"
 
+require "hq/tools/base-script"
 require "hq/tools/getopt"
 
 module HQ
 module GrapherIcingaPerfdata
 
-class Script
-
-	attr_accessor :args
-	attr_accessor :status
-
-	attr_accessor :stdout
-	attr_accessor :stderr
+class Script < Tools::BaseScript
 
 	def main
+
+		@status = 0
 
 		process_args
 
@@ -24,8 +21,6 @@ class Script
 			|filename|
 			process_file filename
 		end
-
-		@status = 0
 
 	end
 
@@ -78,16 +73,33 @@ class Script
 		File.open filename, "r" do
 			|file_io|
 
+			line_number = -1
+
 			while line = file_io.gets
+
+				line_number = line_number + 1
 
 				timestamp_str, host, service, data_str =
 					line.split ",", 4
 
 				timestamp = timestamp_str.to_i
 
-				data = Hash[
-					parse_data(data_str),
-				]
+				data_array = parse_data data_str
+
+				unless data_array
+
+					@stderr.puts "Ignoring invalid data on line %s: %s" % [
+						line_number + 1,
+						line.strip,
+					]
+
+					@status = 1
+
+					next
+
+				end
+
+				data = Hash[data_array]
 
 				mapping_key = {
 					host: host,
@@ -118,7 +130,11 @@ class Script
 
 	def parse_data rest
 
+		# empty string is easy
+
 		return [] if rest =~ /^\s*$/
+
+		# get next lot of data using regex
 
 		regexp =
 			/^
@@ -134,19 +150,30 @@ class Script
 
 		match_data = regexp.match rest
 
-		return nil unless match_data
+		return false unless match_data
 
 		name = match_data[1] || match_data[2]
 		name.gsub! "''", "'"
 
 		value = match_data[3]
 
-		new_rest = match_data[4]
+		new_rest = match_data[4] || ""
+
+		# parse rest of string recursively
+
+		new_rest_parsed =
+			parse_data new_rest
+
+		return false \
+			unless new_rest_parsed
+
+		# and return
 
 		return [
 			[ name, value ],
-			* new_rest ? parse_data(new_rest) : [],
+			* new_rest_parsed,
 		]
+
 
 	end
 
